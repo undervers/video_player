@@ -9,10 +9,9 @@
         android:icon="@drawable/ic_launcher"
         android:name=".videomobileclient.VideoClientApp">
 
-
-
         <activity
-            android:name=".videomobileclient.MainActivity">
+            android:name=".videomobileclient.MainActivity"
+            android:screenOrientation="sensorLandscape">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN">

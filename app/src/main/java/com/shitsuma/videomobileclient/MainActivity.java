@@ -1,21 +1,25 @@
 package com.shitsuma.videomobileclient;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.shitsuma.R;
 import com.shitsuma.videomobileclient.http.HttpResponseHandler;
 import com.shitsuma.videomobileclient.model.ServerConst;
 import com.shitsuma.videomobileclient.model.VideoInfo;
@@ -54,7 +58,7 @@ public class MainActivity extends Activity {
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
                 String videoUrl = videoParser.parseVideoUrl(new String(bytes));
 
-                playVideo(videoUrl);
+                createVideoLayout(videoUrl);
             }
         });
     }
@@ -96,13 +100,58 @@ public class MainActivity extends Activity {
     }
 
 
-    private void playVideo(String videoUrl) {
+    private void createVideoLayout(String videoUrl) {
 
-        VideoView video = new VideoView(this);
+        ViewGroup videoLayout = (ViewGroup) View.inflate(this, R.layout.video_player_layout, null);
+
+        final View waiting = videoLayout.findViewById(R.id.waiting_bar);
+        waiting.setVisibility(View.VISIBLE);
+
+        /*MediaPlayer player = MediaPlayer.create(this, 0);
+        player.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+            @Override
+            public void onBufferingUpdate(MediaPlayer mp, int percent) {
+                waiting.setVisibility(View.VISIBLE);
+            }
+        });*/
+
+        //MediaController controller = new MediaController(this);
+        //controller.setMediaPlayer(player);
+
+        final VideoView video = ((VideoView) videoLayout.findViewById(R.id.video_view));
+        video.setMediaController(new MediaController(this));
         video.setVideoURI(Uri.parse(videoUrl));
+        video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                waiting.setVisibility(View.GONE);
+                video.start();
 
-        setContentView(video);
 
-        video.start();
+
+                mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                    @Override
+                    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+
+                        if(what == MediaPlayer.MEDIA_INFO_BUFFERING_END){
+                            waiting.setVisibility(View.GONE);
+                            return true;
+                        }
+
+                        if(what == MediaPlayer.MEDIA_INFO_BUFFERING_START){
+                            waiting.setVisibility(View.VISIBLE);
+                            return true;
+                        }
+
+                        return false;
+                    }
+                });
+            }
+        });
+
+
+
+
+        setContentView(videoLayout);
     }
 }
