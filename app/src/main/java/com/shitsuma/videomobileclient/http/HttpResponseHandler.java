@@ -20,8 +20,7 @@ public abstract class HttpResponseHandler extends AsyncHttpResponseHandler {
 
     @Override
     public void onStart(){
-        waitingDialog =
-                ProgressDialog.show(context, context.getString(R.string.loading_data), context.getString(R.string.waiting_please));
+        waitingDialog = ProgressDialog.show(context, "", context.getString(R.string.waiting_please));
     }
 
     @Override
