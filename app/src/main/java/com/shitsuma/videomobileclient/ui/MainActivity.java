@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -37,17 +38,17 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main_screen);
 
         videosList = (GridView) findViewById(R.id.videos_list);
 
         videoFragment = new VideoPlayerFragment();
         getFragmentManager()
-                .beginTransaction()
-                .add(R.id.video_player, videoFragment)
-                .hide(videoFragment)
-                .commit();
+            .beginTransaction()
+            .add(R.id.video_player, videoFragment)
+            .hide(videoFragment)
+            .commit();
 
         downloadVideosInfo(ServerConst.XHAMSTER_URL);
     }
@@ -109,6 +110,7 @@ public class MainActivity extends Activity {
     public void onBackPressed() {
         if(videoFragment.isVisible()){
             showVideoPlayer(false);
+            videoFragment.pauseVideo();
         }else{
             super.onBackPressed();
         }
