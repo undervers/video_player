@@ -1,9 +1,6 @@
 package com.shitsuma.videomobileclient.parsers;
 
 
-import android.net.Uri;
-import android.widget.VideoView;
-
 import com.shitsuma.videomobileclient.model.VideoInfo;
 
 import org.jsoup.Jsoup;

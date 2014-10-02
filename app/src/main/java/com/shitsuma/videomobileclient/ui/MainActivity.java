@@ -2,35 +2,27 @@ package com.shitsuma.videomobileclient.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.commonsware.cwac.endless.EndlessAdapter;
 import com.shitsuma.R;
 import com.shitsuma.videomobileclient.http.HttpResponseHandler;
-import com.shitsuma.videomobileclient.model.ServerConst;
+import com.shitsuma.videomobileclient.http.ServerUtils;
 import com.shitsuma.videomobileclient.model.VideoInfo;
 import com.shitsuma.videomobileclient.parsers.Parser;
 import com.shitsuma.videomobileclient.parsers.XhamsterParser;
 
 import org.apache.http.Header;
+
 import java.util.List;
 
 
 public class MainActivity extends Activity {
 
     private Parser videoParser = new XhamsterParser();
-    private AsyncHttpClient httpClient = new AsyncHttpClient();
 
     private GridView videosList;
     private VideoPlayerFragment videoFragment;
@@ -50,11 +42,11 @@ public class MainActivity extends Activity {
             .hide(videoFragment)
             .commit();
 
-        downloadVideosInfo(ServerConst.XHAMSTER_URL);
+        downloadVideosInfo();
     }
 
-    private void downloadVideosInfo(String pageUrl){
-        httpClient.get(pageUrl, new HttpResponseHandler(this) {
+    private void downloadVideosInfo(){
+        ServerUtils.getInstance().downloadVideosInfo(new HttpResponseHandler(this) {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
                 List<VideoInfo> videos = videoParser.parseVideosList(new String(bytes));
@@ -64,7 +56,7 @@ public class MainActivity extends Activity {
     }
 
     private void downloadVideoDetail(String detailUrl){
-        httpClient.get(detailUrl, new HttpResponseHandler(this) {
+        ServerUtils.getInstance().downloadHtml(detailUrl, new HttpResponseHandler(this) {
             @Override
             public void onSuccess(int i, Header[] headers, byte[] bytes) {
                 String videoUrl = videoParser.parseVideoUrl(new String(bytes));
@@ -75,7 +67,9 @@ public class MainActivity extends Activity {
     }
 
     private void initMainPage(final List<VideoInfo> videos) {
-        videosList.setAdapter(new VideosListAdapter(this, videos));
+        EndlessAdapter adapter = new VideoEndlessAdapter(this, new VideosListAdapter(this, videos));
+
+        videosList.setAdapter(adapter);
         videosList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

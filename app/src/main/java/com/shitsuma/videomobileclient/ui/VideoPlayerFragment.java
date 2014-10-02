@@ -81,8 +81,6 @@ public class VideoPlayerFragment extends Fragment {
 
         @Override
         public boolean onInfo(MediaPlayer mp, int what, int extra) {
-
-            Log.d("media player debug what - ", "" + what);
             //!!!!
             //Find which value is 703 and 3
             if(what == MediaPlayer.MEDIA_INFO_BUFFERING_END || what == 3){
