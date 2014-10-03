@@ -6,7 +6,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.shitsuma.R;
+import com.shitsuma.videomobileclient.R;
 
 import org.apache.http.Header;
 

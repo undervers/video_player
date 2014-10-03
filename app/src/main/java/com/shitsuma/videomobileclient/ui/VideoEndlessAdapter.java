@@ -32,7 +32,7 @@ public class VideoEndlessAdapter extends EndlessAdapter {
     @Override
     protected boolean cacheInBackground() throws Exception {
         ///!!!!!!Fix this
-        final int videosOnPage = 46;
+        final int videosOnPage = 48;
         cached = ServerUtils.getInstance().syncDownloadVideosInfo(wrapped.getCount() / videosOnPage);
 
         return (cached != null && cached.size() > 0);

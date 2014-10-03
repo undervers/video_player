@@ -15,6 +15,7 @@ import java.util.List;
 public class ServerUtils {
     private static final String XHAMSTER_URL = "http://xhamster.com";
     private static final String NEXT_PAGE_URL_FORMAT = "/new/%s.html";
+    private static final String SEARCH_REQUEST_FORMAT = "/search.php?q=%s&qcat=video";
     private static ServerUtils instance;
 
     private AsyncHttpClient httpClient;
@@ -41,6 +42,11 @@ public class ServerUtils {
 
     public void downloadVideosInfo(HttpResponseHandler handler){
         downloadHtml(XHAMSTER_URL, handler);
+    }
+
+    public void makeSearchRequest(String searchPhrase, HttpResponseHandler handler){
+        String searchUrl = XHAMSTER_URL + String.format(SEARCH_REQUEST_FORMAT, searchPhrase);
+        downloadHtml(searchUrl, handler);
     }
 
     public List<VideoInfo> syncDownloadVideosInfo(int pageNumber) throws IOException {

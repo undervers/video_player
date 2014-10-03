@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.shitsuma.R;
+import com.shitsuma.videomobileclient.R;
 import com.shitsuma.videomobileclient.model.VideoInfo;
 
 import java.util.List;

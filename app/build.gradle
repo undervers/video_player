@@ -6,7 +6,6 @@ android {
     buildToolsVersion "20.0.0"
 
     defaultConfig {
-        applicationId "com.example.oleg.myapplication"
         minSdkVersion 14
         versionCode 1
         versionName "1.0"
