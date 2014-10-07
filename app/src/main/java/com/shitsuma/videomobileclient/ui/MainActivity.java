@@ -1,11 +1,11 @@
 package com.shitsuma.videomobileclient.ui;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -132,16 +132,22 @@ public class MainActivity extends Activity implements TextView.OnEditorActionLis
 
     private void searchVideo(String searchPhrase) {
         if (searchPhrase.length() > 0) {
-            searchPhrase = Uri.encode(searchPhrase);
+            hideKeyboard();
+
             ServerUtils.getInstance().makeSearchRequest(searchPhrase, videosListHandler);
         }
     }
 
+    private void hideKeyboard(){
+        InputMethodManager input = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        input.hideSoftInputFromWindow(searchWord.getWindowToken(), 0);
+    }
+
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if(event.getKeyCode() == KeyEvent.KEYCODE_ENTER){
+        if(event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                && event.getAction() == KeyEvent.ACTION_DOWN){
             searchVideo();
-
             return true;
         }
 

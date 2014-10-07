@@ -1,6 +1,7 @@
 package com.shitsuma.videomobileclient.http;
 
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -45,7 +46,7 @@ public class ServerUtils {
     }
 
     public void makeSearchRequest(String searchPhrase, HttpResponseHandler handler){
-        String searchUrl = XHAMSTER_URL + String.format(SEARCH_REQUEST_FORMAT, searchPhrase);
+        String searchUrl = XHAMSTER_URL + String.format(SEARCH_REQUEST_FORMAT, Uri.encode(searchPhrase));
         downloadHtml(searchUrl, handler);
     }
 
