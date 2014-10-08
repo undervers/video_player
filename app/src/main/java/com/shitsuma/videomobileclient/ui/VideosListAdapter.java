@@ -2,6 +2,7 @@ package com.shitsuma.videomobileclient.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,8 @@ public class VideosListAdapter extends ArrayAdapter <VideoInfo> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.d("url debuging", "" + getCount());
+
         View layout;
         final ViewHolder holder;
 

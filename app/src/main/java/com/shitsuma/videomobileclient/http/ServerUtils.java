@@ -15,8 +15,8 @@ import java.util.List;
 
 public class ServerUtils {
     private static final String XHAMSTER_URL = "http://xhamster.com";
-    private static final String NEXT_PAGE_URL_FORMAT = "/new/%s.html";
-    private static final String SEARCH_REQUEST_FORMAT = "/search.php?q=%s&qcat=video";
+    private static final String NEW_VIDEOS_URL_FORMAT = "/new/%s.html";
+    private static final String SEARCH_REQUEST_FORMAT = "/search.php?q=%s&qcat=video&page=%s";
     private static ServerUtils instance;
 
     private AsyncHttpClient httpClient;
@@ -42,22 +42,45 @@ public class ServerUtils {
     }
 
     public void downloadVideosInfo(HttpResponseHandler handler){
-        downloadHtml(XHAMSTER_URL, handler);
+        downloadVideosInfo(handler, 1);
+    }
+
+    public void downloadVideosInfo(HttpResponseHandler handler, int pageNumber){
+        String url = createNewVideosUrl(pageNumber);
+        downloadHtml(url, handler);
     }
 
     public void makeSearchRequest(String searchPhrase, HttpResponseHandler handler){
-        String searchUrl = XHAMSTER_URL + String.format(SEARCH_REQUEST_FORMAT, Uri.encode(searchPhrase));
+        makeSearchRequest(searchPhrase, handler, 1);
+    }
+
+    public void makeSearchRequest(String searchPhrase, HttpResponseHandler handler, int pageNumber){
+        String searchUrl = createSearchUrl(searchPhrase, pageNumber);
         downloadHtml(searchUrl, handler);
     }
 
-    public List<VideoInfo> syncDownloadVideosInfo(int pageNumber) throws IOException {
+    private String createSearchUrl(String searchPhrase, int pageNumber){
+        return XHAMSTER_URL + String.format(SEARCH_REQUEST_FORMAT, Uri.encode(searchPhrase), pageNumber);
+    }
 
-        String nextPageUrl = String.format(NEXT_PAGE_URL_FORMAT, String.valueOf(pageNumber));
-        Log.d("url debuging", ServerUtils.XHAMSTER_URL + nextPageUrl);
+    private String createNewVideosUrl(int pageNumber){
+        return XHAMSTER_URL + String.format(NEW_VIDEOS_URL_FORMAT, pageNumber);
+    }
 
-        String response = Jsoup.connect(ServerUtils.XHAMSTER_URL + nextPageUrl)
+    public List<VideoInfo> syncMakeSearchRequest(String searchPhrase, int pageNumber) throws IOException {
+        return syncDownloadVideos(createSearchUrl(searchPhrase, pageNumber));
+    }
+
+    public List<VideoInfo> syncGetNewVideos(int pageNumber) throws IOException {
+        return syncDownloadVideos(createNewVideosUrl(pageNumber));
+    }
+
+    private List<VideoInfo> syncDownloadVideos(String url) throws IOException {
+        String response = Jsoup.connect(url)
                 .execute()
                 .body();
+
+        Log.d("url debuging", url);
 
         return parser.parseVideosList(response);
     }

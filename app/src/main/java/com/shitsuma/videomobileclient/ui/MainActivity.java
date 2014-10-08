@@ -2,6 +2,7 @@ package com.shitsuma.videomobileclient.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -36,7 +37,7 @@ public class MainActivity extends Activity implements TextView.OnEditorActionLis
 
     private VideoPlayerFragment videoFragment;
 
-    private VideosListHandler videosListHandler;
+    private NewVideosHandler videosListHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class MainActivity extends Activity implements TextView.OnEditorActionLis
 
         videoParser = new XhamsterParser();
 
-        videosListHandler = new VideosListHandler();
+        videosListHandler = new NewVideosHandler();
 
         videosListLayout = findViewById(R.id.videos_list_layout);
         videosList = (GridView) videosListLayout.findViewById(R.id.videos_list);
@@ -81,14 +82,22 @@ public class MainActivity extends Activity implements TextView.OnEditorActionLis
         });
     }
 
-    private void initMainPage(final List<VideoInfo> videos) {
+    private void showNewVideos(final List<VideoInfo> videos) {
         EndlessAdapter adapter = new VideoEndlessAdapter(this, new VideosListAdapter(this, videos));
+        initMainPage(adapter);
+    }
 
+    private void showSearchPage(final List<VideoInfo> videos, String searchPhrase) {
+        EndlessAdapter adapter = new VideoEndlessAdapter(this, new VideosListAdapter(this, videos),  searchPhrase);
+        initMainPage(adapter);
+    }
+
+    private void initMainPage(EndlessAdapter adapter){
         videosList.setAdapter(adapter);
         videosList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                VideoInfo video = videos.get(position);
+                VideoInfo video = (VideoInfo) parent.getItemAtPosition(position);
                 downloadVideoDetail(video.getVideoPageUrl());
             }
         });
@@ -134,7 +143,7 @@ public class MainActivity extends Activity implements TextView.OnEditorActionLis
         if (searchPhrase.length() > 0) {
             hideKeyboard();
 
-            ServerUtils.getInstance().makeSearchRequest(searchPhrase, videosListHandler);
+            ServerUtils.getInstance().makeSearchRequest(searchPhrase, new SearchVideosHandler(searchPhrase));
         }
     }
 
@@ -159,16 +168,36 @@ public class MainActivity extends Activity implements TextView.OnEditorActionLis
         searchVideo();
     }
 
-    private class VideosListHandler extends HttpResponseHandler {
+    private class NewVideosHandler extends HttpResponseHandler {
 
-        public VideosListHandler() {
+        public NewVideosHandler() {
             super(MainActivity.this);
         }
 
         @Override
         public void onSuccess(int i, Header[] headers, byte[] bytes) {
             List<VideoInfo> videos = videoParser.parseVideosList(new String(bytes));
-            initMainPage(videos);
+            Log.d("url debuging", "" + videos.size());
+
+            showNewVideos(videos);
+        }
+    }
+
+    private class SearchVideosHandler extends HttpResponseHandler {
+
+        private String searchPhrase;
+
+        public SearchVideosHandler(String searchPhrase) {
+            super(MainActivity.this);
+
+            this.searchPhrase = searchPhrase;
+        }
+
+        @Override
+        public void onSuccess(int i, Header[] headers, byte[] bytes) {
+            List<VideoInfo> videos = videoParser.parseVideosList(new String(bytes));
+
+            showSearchPage(videos, searchPhrase);
         }
     }
 }
